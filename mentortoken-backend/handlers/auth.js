@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const sendMail = require("../pkg/helper/sendMail");
 
-const { getByEmail, getById, createUser, updateUser, setNewPassword } = require("../pkg/user");
+const { getByEmail, getById, createUser, updateUser, } = require("../pkg/user");
 const {
   validateAccount,
   AccoutLogin,

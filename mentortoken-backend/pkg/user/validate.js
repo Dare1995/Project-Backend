@@ -63,7 +63,8 @@ const validateAccount = async (data, schema) => {
   if (!err) {
     throw {
       code: 400,
-      error: await validator.errors,
+      message: "Validation failed",
+      errors: validator.errors,
     };
   }
 };

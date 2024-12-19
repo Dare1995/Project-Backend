@@ -108,6 +108,10 @@ const updateUser = async (_id, account) => {
   return await AccountsModel.updateOne({ _id }, account);
 };
 
+const deleteUser = async (_id) => {
+  return await AccountsModel.deleteOne({ _id })
+}
+
 const getByEmail = async (email) => {
   return await AccountsModel.findOne({ email });
 };
@@ -116,15 +120,10 @@ const getById = async (_id) => {
   return await AccountsModel.findOne({_id});
 };
 
-const setNewPassword = async (id, password) => {
-  return await AccountsModel.updateOne({ _id: id }, { password });
-};
-
-
 module.exports = {
   createUser,
   updateUser,
   getByEmail,
   getById,
-  setNewPassword,
+  deleteUser,
 };
