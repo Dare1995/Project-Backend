@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Manrope:wght@200..800&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Poppins:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+    <title>Contact Message</title>
+    <%- await include('contactStyles.ejs') %>
+</head>
+<body>
+    
+    <div class='contact_message'>
+        <div class="message_section">
+            <label htmlFor="fullName">FullName</label>
+            <p id="fullName"><%= data.fullName %></p>
+        </div>
+        <div class="message_section">
+            <label htmlFor="email">Email</label>
+            <p id="email"><%= data.email %></p>
+        </div>
+        <div class="message_section">
+            <label htmlFor="message">Message</label>
+            <textarea id="message">
+                <%= data.message %>
+            </textarea>
+        </div>
+        </div>
+</body>
+</html>

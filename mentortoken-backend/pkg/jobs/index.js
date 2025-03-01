@@ -54,16 +54,12 @@ const findOneJob = async (_id) => {
     return await JobModel.findOne({ _id });
 };
 
-// const jobListId = async (ids) => {
-//     const idArray = ids.split(",").map(id => id.trim().toString());
-//     return await JobModel.find({_id: { $in: idArray }});
-// };
 const jobListIds = async (ids) => {
     const idArray = ids.split(",").map(id => id.trim());
     return await JobModel.find({ _id: { $in: idArray } });
 };
 
-const listJobsByCompany = async (companyId, status = "open") => {
+const jobListByCompany = async (companyId, status = "open") => {
     return await JobModel.find({ companyId, status });
 };
 
@@ -77,6 +73,6 @@ module.exports = {
     remove,
     findOneJob,
     jobListIds,
-    listJobsByCompany,
+    jobListByCompany,
     openJobsList,
 };

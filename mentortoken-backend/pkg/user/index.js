@@ -120,10 +120,42 @@ const getById = async (_id) => {
   return await AccountsModel.findOne({_id});
 };
 
+const getCompanies = async (query) => {
+  return await AccountsModel.find({...{type: "company"},...query});
+};
+
+const getMentors = async (query) => {
+  return await AccountsModel.find({...{type: "mentor"},...query});
+};
+
+const getCompanyByName = async (query) => {
+  const regex = new RegExp(query, "i");
+  return await AccountsModel.find({type: "company", name: {$regex: regex}});
+};
+
+const getMentorByName = async (query) => {
+  const regex = new RegExp(query, "i");
+  return await AccountsModel.find({type: "mentor", name: {$regex: regex}});
+};
+
+const getCompanyId = async (_id) => {
+  return await AccountsModel.findOne({type: "company", _id});
+};
+
+const getMentorId = async (_id) => {
+  return await AccountsModel.findOne({type: "mentor", _id});
+};
+
 module.exports = {
   createUser,
   updateUser,
   getByEmail,
   getById,
   deleteUser,
+  getCompanies,
+  getMentors,
+  getCompanyByName,
+  getMentorByName,
+  getCompanyId,
+  getMentorId,
 };

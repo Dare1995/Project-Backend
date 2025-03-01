@@ -8,11 +8,11 @@ const connect = async () => {
     console.log("Mongoose is connected with MongoDB");
   } catch (err) {
     console.error(err.message);
-    process.exit(1); // Exit the process if connection fails
+    process.exit(1);
   }
 };
 
-module.exports = connect; // Export the function
+module.exports = connect;
 
 
 

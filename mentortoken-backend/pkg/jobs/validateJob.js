@@ -9,30 +9,47 @@ const NewJobValidate = {
     status: "required|string",
 };
 
-const JobUpdate = {
-    title: "string",
-    description: "string",
-    category: "string",
-    skillsRequired: "array",
-    "skills.*": "string",
-    status: "string"
-};
+// const JobUpdate = {
+//     title: "string",
+//     description: "string",
+//     category: "string",
+//     skillsRequired: "array",
+//     "skills.*": "string",
+//     status: "string"
+// };
 
+// const validateJob = async (data, schema) => {
+//     const validator = new Validator(data, schema);
+//     const err = await validator.check();
+
+//     if(!err) {
+//         throw {
+//             code: 400,
+//             message: "Validation failed",
+//             errors: validator.errors,
+//         };
+//     };
+// };
 const validateJob = async (data, schema) => {
     const validator = new Validator(data, schema);
     const err = await validator.check();
 
-    if(!err) {
+    if (!err) {
+        const errorMessages = Object.entries(validator.errors).map(([key, value]) => ({
+            field: key,
+            message: value.message,
+        }));
         throw {
             code: 400,
             message: "Validation failed",
-            errors: validator.errors,
+            errors: errorMessages,
         };
-    };
+    }
 };
+
 
 module.exports = {
     NewJobValidate,
-    JobUpdate,
+    // JobUpdate,
     validateJob,
 };

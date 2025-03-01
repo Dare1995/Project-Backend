@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const sendMail = require("../pkg/helper/sendMail");
 
-const { getByEmail, getById, createUser, updateUser, } = require("../pkg/user");
+const { getByEmail, getById, createUser, updateUser, getCompanies, getMentors, getMentorByName, getCompanyByName, getCompanyId, getMentorId } = require("../pkg/user");
 const {
   validateAccount,
   AccoutLogin,
@@ -42,14 +42,13 @@ const login = async (req, res) => {
     return res.status(200).send({ token });
   } catch (err) {
     console.error(err);
-    return res.status(500).send("Internal Server Error!");
+    return res.status(500).send("Internal Server Error!!");
   }
 };
 
 const register = async (req, res) => {
   try {
     await validateAccount(req.body, AccoutRegister);
-    // const { username, email, password, confirmPassword } = req.body;
     const {
       name,
       email,
@@ -81,7 +80,7 @@ const register = async (req, res) => {
 
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Internal Server Error!" });
   };
 };
 
@@ -98,7 +97,7 @@ const update = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Internal Server Error!" });
   }
 };
 
@@ -129,7 +128,7 @@ const forgotPassword = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Internal Server Error!" });
   }
 };
 
@@ -174,7 +173,7 @@ const resetPasswordEmail = async (req, res) => {
 
     // Log unexpected errors and respond with a generic error
     console.error("Unexpected error during reset token validation:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error!" });
   }
 };
 
@@ -228,7 +227,7 @@ const resetUserPassword = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Internal Server Error!" });
   }
 };
 
@@ -245,10 +244,96 @@ const checkEmail = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: "Internal Server Error!" });
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const user = await getById(req.auth.id);
+    if(user) {
+      return res.status(200).send(user)
+    } else {
+      return res.status(400).send("Account not found!");
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!"})
+  };
+};
+
+const getAllCompanies = async (req, res) => {
+  try {
+    const companies = await getCompanies(req.query);
+    return res.status(200).send(companies);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!" })
+  }
+}
+
+const getAllMentors = async (req, res) => {
+  try {
+    const mentors = await getMentors();
+    return res.status(200).send(mentors);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!"})
+  };
+};
+
+const getUserMentorName = async (req, res) => {
+  try {
+    const user = await getMentorByName(req.params.name);
+    return res.status(200).send(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!" })
+  };
+};
+
+const getUserCompanyName = async (req, res) => {
+  try {
+    const user = await getCompanyByName(req.params.name);
+    return res.status(200).send(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!" })
+  };
+};
+
+const getCompanyById = async (req, res) => {
+  try {
+    const company = await getCompanyId(req.params._id);
+    return res.status(200).send(company);
+  } catch(err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!" })
+  };
+};
+
+const getMentorById = async (req, res) => {
+  try {
+    const mentor = await getMentorId(req.params._id);
+    return res.status(200).send(mentor);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!" })
+  };
+};
+// const getMentorById = async (req, res) => {
+//   try {
+//     const mentorId = req.params.mentorId; // Correct way to access mentorId from URL
+//     const mentor = await getMentorId(mentorId); // Ensure getMentorId is correctly defined
+//     if (!mentor) {
+//       return res.status(404).send({ error: "Mentor not found!" });
+//     }
+//     return res.status(200).json(mentor);
+//   } catch (err) {
+//     console.error("Error fetching mentor:", err);
+//     return res.status(500).send({ error: "Internal Server Error!" });
+//   }
+// };
 module.exports = {
   login,
   register,
@@ -257,4 +342,11 @@ module.exports = {
   resetPasswordEmail,
   resetUserPassword,
   checkEmail,
+  getUser,
+  getAllCompanies,
+  getAllMentors,
+  getUserCompanyName,
+  getUserMentorName,
+  getCompanyById,
+  getMentorById,
 };

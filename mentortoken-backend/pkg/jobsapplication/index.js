@@ -42,7 +42,7 @@ const JobApplicationSchema = mongoose.Schema(
 
 const JobApplicationModel = mongoose.model("Application", JobApplicationSchema, "applications");
 
-// This is for Company!
+// This is for Company
 const createCompanyApplication = async (application) => {
     const newApplication = new JobApplicationModel(application);
     return await newApplication.save();
@@ -61,7 +61,7 @@ const listApplication = async (application) => {
 };
 
 const listCompanyApplication = async (companyId, acceptedStatus) => {
-    console.log("This is what i got: ", { companyId, acceptedStatus });
+    // console.log("Company-Application: ", { companyId, acceptedStatus });
     if (acceptedStatus) {
         return await JobApplicationModel.find({ companyId, acceptedStatus });
     } else {
@@ -77,7 +77,7 @@ const listCompanyMentorApp = async (companyId, mentorId, acceptedStatus = false)
     };
 };
 
-// This is for Mentor!
+// This is for Mentor
 const createMentorApplication = async (job) => {
     const application = new JobApplicationModel(job);
     return await application.save();
@@ -105,20 +105,18 @@ const findMentorApplicationByJobId = async (mentorId, jobId) => {
 
 const findApplication = async (_id) => {
     return await JobApplicationModel.findOne({ _id });
+    // return await JobApplicationModel.findById(_id);
 };
 
 const findPendingApplicationJobId = async (jobId) => {
-    return await Application.find({ jobId, acceptedStatus: "pending" });
+    return await JobApplicationModel.find({ jobId, acceptedStatus: "pending" });
 };
 
 const findDateApp = async (mentorId, date) => {
-    if (date !== "null") {
-        return await JobApplicationModel.find({
-            mentorId, updatedAt: { $gte: date }
-        });
-    } else {
-        return await JobApplicationModel.find({ mentorId });
-    };
+    return await JobApplicationModel.find({
+        mentorId,
+        ...(date !== "null" && { updatedAt: { $gte: date } })
+    });
 };
 
 const findCompanyDateApp = async (companyId, date) => {
