@@ -11,13 +11,12 @@ const createJob = async (req, res) => {
         return res.status(201).send(createNewJob);
     } catch (err) {
         if (err.code === 400) {
-            return res.status(400).send(err); // Send validation errors
+            return res.status(400).send(err);
         }
         console.error(err);
         return res.status(500).send({ message: "Internal Server Error" });
     }
 };
-
 
 const deleteJob = async (req, res) => {
    try {

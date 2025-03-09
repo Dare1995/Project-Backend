@@ -1,30 +1,12 @@
 const { createCompanyApplication, updateCompanyApplication, deleteCompanyApplication, findCompanyDirect, listCompanyApplication, listCompanyMentorApp, findPendingApplicationJobId, findCompanyDateApp }
     = require("../pkg/jobsapplication");
 
-// const createCompanyJobApplication = async (req, res) => {
-//     try {
-//         const application = await createCompanyApplication({
-//             jobId: req.params.jobId,
-//             mentorId: req.params.mentorId,
-//             companyId: req.auth.id,
-//             applicationType: "companyToMentor",
-//             status: "pending",
-//             acceptedStatus: "pending",
-//         });
-//         return res.status(200).send(application);
-//     } catch (err) {
-//         console.error(err);
-//         return res.status(500).send("Internal Server Error!");
-//     }
-// };
 const createCompanyJobApplication = async (req, res) => {
     try {
-        // Validate params
         if (!req.params.jobId || !req.params.mentorId) {
             return res.status(400).send({ success: false, message: "Missing required parameters." });
         }
 
-        // Create application
         const application = await createCompanyApplication({
             jobId: req.params.jobId,
             mentorId: req.params.mentorId,
@@ -34,7 +16,6 @@ const createCompanyJobApplication = async (req, res) => {
             acceptedStatus: "pending",
         });
 
-        // Success response
         return res.status(201).send({ success: true, data: application, message: "Application created successfully." });
     } catch (err) {
         console.error({ error: err.message, stack: err.stack });

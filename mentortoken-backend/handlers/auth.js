@@ -1,14 +1,27 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const sendMail = require("../pkg/helper/sendMail");
+const sendMail = require("../pkg/helper/sendEmail");
+const sendMessage = require("../pkg/helper/sendEmail")
 
-const { getByEmail, getById, createUser, updateUser, getCompanies, getMentors, getMentorByName, getCompanyByName, getCompanyId, getMentorId } = require("../pkg/user");
+const { getByEmail,
+  getById,
+  createUser,
+  updateUser,
+  getCompanies,
+  getMentors,
+  getMentorByName,
+  getCompanyByName,
+  getCompanyId,
+  getMentorId
+} = require("../pkg/user");
+
 const {
   validateAccount,
   AccoutLogin,
   AccoutRegister,
   AccountPassword,
   AccountUpdate,
+  AccountContactMessage,
 } = require("../pkg/user/validate");
 const { getSection } = require("../pkg/config");
 
@@ -105,14 +118,12 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     const existsEmail = await getByEmail(email);
-    // Check if there is a user registered with this email
     if (existsEmail) {
       const objectData = {
         id: existsEmail._id,
         exp: new Date().getTime() / 1000 + 15 * 60
       };
 
-      // Create a token using JWT
       const token = jwt.sign(objectData, getSection("development").jwt_secret);
 
       const emailSendResponse = await sendMail(
@@ -134,36 +145,30 @@ const forgotPassword = async (req, res) => {
 
 const resetPasswordEmail = async (req, res) => {
   try {
-    // Validate the presence of resetToken
     const resetToken = req.params.resetToken;
     if (!resetToken) {
       return res.status(400).json({ error: "Missing reset token" });
     }
 
-    // Decode and verify the JWT token
     const decodedToken = jwt.verify(
       resetToken,
       getSection("development").jwt_secret
     );
 
-    // Validate that the token contains the required claims
     if (!decodedToken.id || !decodedToken.exp) {
       return res.status(400).json({ error: "Invalid reset token" });
     }
 
-    // Fetch the user by ID
-    const user = await getById(decodedToken.id);
+   const user = await getById(decodedToken.id);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Respond with the user's email and token expiration
     return res.status(200).json({
       email: user.email,
       expiration: decodedToken.exp,
     });
   } catch (err) {
-    // Handle JWT-specific errors
     if (err.name === "TokenExpiredError") {
       return res.status(401).json({ error: "Reset token expired" });
     }
@@ -171,7 +176,6 @@ const resetPasswordEmail = async (req, res) => {
       return res.status(400).json({ error: "Invalid reset token" });
     }
 
-    // Log unexpected errors and respond with a generic error
     console.error("Unexpected error during reset token validation:", err.message);
     return res.status(500).json({ error: "Internal Server Error!" });
   }
@@ -179,15 +183,13 @@ const resetPasswordEmail = async (req, res) => {
 
 const resetUserPassword = async (req, res) => {
   try {
-    // Validate the input
+
     await validateAccount(req.body, AccountPassword);
     const { newPassword, confirmNewPassword } = req.body;
 
-    // Verify and decode the JWT token
     const decodedToken = jwt.verify(req.params.resetToken, getSection("development").jwt_secret);
-    const decodedParsed = decodedToken; // No need for JSON.parse()
+    const decodedParsed = decodedToken;
 
-    // Check if the token is expired
     if (decodedParsed.exp < Math.floor(Date.now() / 1000)) {
       return res.status(400).send({
         status: false,
@@ -195,7 +197,6 @@ const resetUserPassword = async (req, res) => {
       });
     }
 
-    // Check if passwords match
     if (newPassword !== confirmNewPassword) {
       return res.status(422).send({
         status: false,
@@ -203,10 +204,8 @@ const resetUserPassword = async (req, res) => {
       });
     }
 
-    // Fetch the user by ID
     const user = await getById(decodedParsed.id);
 
-    // Check if the new password matches the old password
     if (bcrypt.compareSync(newPassword, user.password)) {
       return res.status(422).send({
         status: false,
@@ -214,13 +213,10 @@ const resetUserPassword = async (req, res) => {
       });
     }
 
-    // Hash the new password
     const newPasswordReset = bcrypt.hashSync(newPassword);
 
-    // Update the user's password in the database
     await updateUser(decodedParsed.id, { password: newPasswordReset });
 
-    // Respond with success
     return res.status(200).send({
       status: true,
       message: "Password has been updated, please login!",
@@ -236,7 +232,6 @@ const checkEmail = async (req, res) => {
   const { email } = req.body;
   try {
     const existsEmail = await getByEmail(email);
-    // check if there is user registered with this email
     if (existsEmail) {
       return res.status(200).send(true);
     } else {
@@ -251,14 +246,14 @@ const checkEmail = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const user = await getById(req.auth.id);
-    if(user) {
+    if (user) {
       return res.status(200).send(user)
     } else {
       return res.status(400).send("Account not found!");
     }
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Internal Server Error!"})
+    return res.status(500).send({ error: "Internal Server Error!" })
   };
 };
 
@@ -278,7 +273,7 @@ const getAllMentors = async (req, res) => {
     return res.status(200).send(mentors);
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ error: "Internal Server Error!"})
+    return res.status(500).send({ error: "Internal Server Error!" })
   };
 };
 
@@ -306,7 +301,7 @@ const getCompanyById = async (req, res) => {
   try {
     const company = await getCompanyId(req.params._id);
     return res.status(200).send(company);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     return res.status(500).send({ error: "Internal Server Error!" })
   };
@@ -321,19 +316,25 @@ const getMentorById = async (req, res) => {
     return res.status(500).send({ error: "Internal Server Error!" })
   };
 };
-// const getMentorById = async (req, res) => {
-//   try {
-//     const mentorId = req.params.mentorId; // Correct way to access mentorId from URL
-//     const mentor = await getMentorId(mentorId); // Ensure getMentorId is correctly defined
-//     if (!mentor) {
-//       return res.status(404).send({ error: "Mentor not found!" });
-//     }
-//     return res.status(200).json(mentor);
-//   } catch (err) {
-//     console.error("Error fetching mentor:", err);
-//     return res.status(500).send({ error: "Internal Server Error!" });
-//   }
-// };
+
+const contactMessage = async (req, res) => {
+  try {
+    await validateAccount(req.body, AccountContactMessage);
+    const emailSendResponse = await sendMessage(
+      "kiprijanovski.darko95@gmail.com",
+      "Mentor Token contact message",
+      "contactMessage",
+      data = {
+        ...req.body
+      }
+    );
+    return res.status(200).send(emailSendResponse);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: "Internal Server Error!" })
+  };
+};
+
 module.exports = {
   login,
   register,
@@ -349,4 +350,5 @@ module.exports = {
   getUserMentorName,
   getCompanyById,
   getMentorById,
+  contactMessage,
 };

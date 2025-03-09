@@ -24,6 +24,7 @@ const {
     getAllMentors,
     getCompanyById,
     getMentorById,
+    contactMessage,
 } = require("./handlers/auth");
 
 const {
@@ -80,6 +81,7 @@ app.use(
             "/api/auth/checkEmail",
             { url: /\/api\/auth\/checkResetToken\/[^/]+$/, methods: ["GET"] },
             { url: /\/api\/auth\/reset-password\/[^/]+$/, methods: ["PUT"] },
+            "/api/contactMessage"
         ],
     })
 );
@@ -128,6 +130,9 @@ app.get("/api/mentor/application/:mentorId/:acceptedStatus", listMentorJobApplic
 app.get("/api/mentor/oneApplication/:id", findOneApplication);
 app.get("/api/mentor/dateApplications/:mentorId/:date", findAppFromDate);
 app.get("/api/mentor/jobApplication/:jobId", findApplicationByMentorJob);
+
+// contact landing page
+app.post("/api/contactMessage", contactMessage)
 
 app.listen(getSection("development").port, () =>
     console.log(`Server starter at port ${getSection("development").port}`)

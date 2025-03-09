@@ -34,5 +34,30 @@ const sendEmail = async (to, subject, template, token) => {
   }
 };
 
+const sendContactMessage = async (to, subject, template,) => {
+  try {
+    const templatePath = path.join(__dirname, 'views', `${template}.ejs`);
 
-module.exports = sendEmail;
+    const html = await ejs.renderFile(templatePath, {data}, { async: true });
+
+    const mailOptions = {
+      from: {
+        name: "Mentor Token",
+        address: process.env.google_account, 
+      },
+      to,
+      subject,
+      html,
+    };
+
+    const info = await transport.sendMail(mailOptions);
+
+    // console.log(`Email sent successfully. Info: ${JSON.stringify(info)}`);
+    return JSON.stringify(info);
+  } catch (err) {
+    console.error('Error sending email:', err);
+  }
+};
+
+
+module.exports = sendEmail, sendContactMessage;
